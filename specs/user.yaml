@@ -1,0 +1,100 @@
+name: AuthAccount
+table: tpt_auth_accounts
+index_label: 用户管理
+new_label: 新建用户
+edit_label: 编辑用户
+fields:
+- name: id
+  description: ID
+  label: ID
+  type: biginteger
+  required: true
+  readonly: true
+  unique: true
+- name: manager_id
+  label: 领导1
+  type: biginteger
+  annotations:
+    referenceFields:
+    - name: name
+      label: 领导1
+    - name: id
+      label: 领导1#
+- name: leader_id
+  label: 领导2
+  type: biginteger
+  annotations:
+    referenceFields:
+    - name: name
+      label: 领导2
+    - name: id
+      label: 领导2#
+- name: name
+  description: 用户名
+  label: 用户名
+  type: string
+  required: true
+  readonly: true
+  unique: true
+  restrictions:
+    minlength: 2
+    maxlength: 250
+- name: password
+  description: 密码
+  label: 密码
+  type: password
+  restrictions:
+    minlength: 8
+    maxlength: 250
+- name: email
+  description: 邮箱
+  label: 邮箱
+  type: string
+  format: email
+- name: sex
+  description: 性别
+  label: 性别
+  type: string
+  required: true
+  restrictions:
+    enumerations:
+    - label: 男
+      value: male
+    - label: 女
+      value: female
+- name: level
+  description: 级别
+  label: 级别
+  type: string
+  required: true
+  annotations:
+    enumerationSource: userLevel
+- name: description
+  description: 描述
+  label: 描述
+  type: string
+  restrictions:
+    maxlength: 2000
+- name: birthday
+  description: 生日
+  label: 生日
+  type: date
+  readonly: true
+- name: created_at
+  description: 创建时间
+  label: 创建时间
+  type: datetime
+  readonly: true
+  annotations:
+    editDisabled: true
+- name: updated_at
+  description: 修改时间
+  label: 修改时间
+  type: datetime
+  annotations:
+    editDisabled: true
+belongsTo:
+- name: manager_id
+  target: AuthAccount
+- name: leader_id
+  target: AuthAccount

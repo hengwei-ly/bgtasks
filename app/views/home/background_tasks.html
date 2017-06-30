@@ -1,0 +1,59 @@
+
+<li id="background_tasks_init" url='{{ url "App.GetBackgroundTasks" }}'>
+  <a title="后台任务" class="right-sidebar-toggle dropdown-toggle count-info">
+    <i class="fa fa-tasks"></i>
+    <span class="label label-danger">0</span>
+  </a>
+</li>
+
+<div id="tasks_list">
+  <div id="right-sidebar" class="animated">
+    <div class="sidebar-container">
+      <div class="tab-content">
+        <div id="tab-2" class="tab-pane active">
+          <ul class="sidebar-list" id="background_tasks_contents">
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="hidden" id="background_process_url" value='{{ url "App.GetBaseBackgroundTaskProcessesById"}}'>
+<script type="application/javascript" id="background_tasks_list_contents">
+    <% if (tasks.length>0){ %>
+    <% for (var i=0;i<tasks.length;i++) { %>
+        <li class="lazur-bg" style="padding-bottom: 8px;padding-top: 8px;">
+                <a href="#" data-toggle="modal" data-target="#myModal4" task_id="<%= tasks[i].id %>" task_name="<%= tasks[i].name %>" class="task_details">
+                <small class="pull-right  text-white"> <%= tasks[i].started_at %></small>
+            <strong><%= tasks[i].name %></strong>
+                </a>
+                </li>
+                <% } %>
+    <% } %>
+</script>
+
+<!--显示具体后台任务的弹窗-->
+<div id="background_task_details">
+
+  <script type="application/javascript" id="task_details_modal">
+      <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog" style="display: block; padding-right: 17px;">
+          <div class="modal-dialog">
+          <div class="modal-content animated">
+          <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title"><%= task.name %></h4>
+          <small class="pull-right">开始时间：<%= task.created_at %></small>
+          </div>
+          <div class="modal-body">
+          <p><h5>任务明细：</h5><%= task.description %></p>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+          </div>
+          </div>
+          </div>
+          </div>
+  </script>
+</div>
