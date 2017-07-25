@@ -20,7 +20,7 @@
   </div>
 </div>
 
-<input type="hidden" id="background_process_url" value='{{ url "App.GetBaseBackgroundTaskProcessesById"}}'>
+<input type="hidden" id="background_progress_url" value='{{ url "App.GetBaseBackgroundTaskProgressesById"}}'>
 <script type="application/javascript" id="background_tasks_list_contents">
     <% if (tasks.length>0){ %>
     <% for (var i=0;i<tasks.length;i++) { %>
@@ -37,23 +37,40 @@
 <!--显示具体后台任务的弹窗-->
 <div id="background_task_details">
 
-  <script type="application/javascript" id="task_details_modal">
-      <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog" style="display: block; padding-right: 17px;">
-          <div class="modal-dialog">
-          <div class="modal-content animated">
-          <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title"><%= task.name %></h4>
-          <small class="pull-right">开始时间：<%= task.created_at %></small>
-          </div>
-          <div class="modal-body">
-          <p><h5>任务明细：</h5><%= task.description %></p>
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-          </div>
-          </div>
-          </div>
-          </div>
-  </script>
 </div>
+<script type="application/javascript" id="task_details_modal">
+  <div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content animated" style=" width:130%">
+        <div class="modal-header">
+          <button type="button" class="close task_modal_close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+          <h4 class="modal-title"><%= name %></h4>
+          <small class="pull-right">开始时间：<%= started_at %></small>
+        </div>
+        <div class="modal-body" id="task_progresses_list" style="height:350px; overflow: auto;">
+      <h4>任务明细：</h4>
+          <% if(progresses.length>0){ %><% for(var i=0;i<progresses.length;i++) { %>
+          <div style="positon:relative">
+            <small class="pull-right" style="padding-left:40px;"><%= progresses[i].created_at %></small>
+            <p style"width:480px;"><%= progresses[i].description %></p>
+          </div>
+          <% } %>
+        <% } else{ %>
+        <div progress = "no_results">当前没有在活动的进度</div>
+          <% } %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-white task_modal_close" data-dismiss="modal">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="application/javascript" id="lastest_task_descriptions">
+  <div>
+    <small class="pull-right" style="padding-left:20px;"><%= progresses.created_at %></small>
+    <p style"width:480px;"><%= progresses.description %></p>
+  </div>
+</script>
+

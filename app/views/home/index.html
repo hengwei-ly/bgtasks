@@ -7,6 +7,10 @@
 {{template "header.html" .}}
 {{template "home/background_tasks.html" .}}
 <div class="full-height">
+  <button onclick="insertProgress(1)">添加1条记录</button>
+  <button onclick="insertProgress(5)">添加5条记录</button>
+  <button onclick="insertProgress(10)">添加10条记录</button>
+  <button onclick="getLastestProgresses()">测试获取最新数据</button>
   <div class="full-height-scroll content border-left">
     <div class="row">
       <div class="col-lg-6">

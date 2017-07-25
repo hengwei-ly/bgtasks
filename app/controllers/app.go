@@ -14,6 +14,8 @@ import (
 
 	"bgtasks/app/models"
 
+	"time"
+
 	"github.com/revel/revel"
 	"github.com/runner-mei/orm"
 	"github.com/three-plus-three/modules/web_ext"
@@ -124,14 +126,47 @@ func (c App) GetBackgroundTasks() revel.Result {
 }
 
 //获取当前已有的进度信息 是查询所有
-func (c App) GetBaseBackgroundTaskProcessesById(task_id int64) revel.Result {
-	backgroundTaskProcesses := []models.BackgroundTaskProcess{}
-	err := c.Lifecycle.DB.BackgroundTaskProcesses().Where().All(&backgroundTaskProcesses)
+func (c App) GetBaseBackgroundTaskProgressesById(task_id int64) revel.Result {
+	backgroundTaskProgresses := []models.BackgroundTaskProgress{}
+	err := c.Lifecycle.DB.BackgroundTaskProgresses().Where(orm.Cond{"background_task_id = ": task_id}).All(&backgroundTaskProgresses)
 	if err != nil {
 		c.Flash.Error("查询当前任务进度失败")
 		c.FlashParams()
 	}
-	return c.RenderJSON(backgroundTaskProcesses)
+	return c.RenderJSON(backgroundTaskProgresses)
+}
+
+//获取最近的进度信息
+func (c App) GetLastestProgressesWithId(task_id int64, currentLength int) revel.Result {
+	backgroundTaskProgresses := []models.BackgroundTaskProgress{}
+	err := c.Lifecycle.DB.BackgroundTaskProgresses().Where(orm.Cond{"background_task_id = ": task_id}).OrderBy("id").Offset(currentLength).Limit(99).All(&backgroundTaskProgresses)
+	if err != nil {
+		c.Flash.Error("获取任务最新进度失败 ")
+		c.FlashParams()
+	}
+	return c.RenderJSON(backgroundTaskProgresses)
+}
+
+//测试用
+func (c App) InsertOneProgress() {
+	backgroundTaskProgress := models.BackgroundTaskProgress{
+		BackgroundTaskId: 1,
+		CreatedAt:        time.Now(),
+	}
+	backgroundTaskProgress.Description = "这里是任务描述撒当机立断卡萨分开弄撒了妇女说看房的科技三分开带伞疯狂圣诞快乐非农大烧烤九分裤删掉就阿凡达框架啊水泥厂小美女安居房女魔都是你的交罚款第三方会计师单" + strconv.Itoa(time.Now().Nanosecond())
+
+	_, err := c.Lifecycle.DB.BackgroundTaskProgresses().Insert(&backgroundTaskProgress)
+	if err != nil {
+		c.Flash.Error("插入测试数据失败")
+		c.FlashParams()
+	}
+}
+
+func (c App) InsertTestProgresses(num int) revel.Result {
+	for i := 0; i < num; i++ {
+		c.InsertOneProgress()
+	}
+	return c.RenderJSON("ok")
 }
 
 //func (c App) Get() revel.Result {

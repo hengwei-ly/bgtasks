@@ -10,13 +10,12 @@ $(function(){
     //通过ajsx获取当前的所有后台任务
     doActivityTasks();
 
-    setInterval("doActivityTasks()",1000*60);
+    setInterval("doActivityTasks()",1000*60,0);
 
 });
 
 //获取当前的所有活动任务，并将数据写入模板
 function doActivityTasks(url) {
-    console.log("写模板啦")
     var url = $('#background_tasks_init').attr('url');
     $.getJSON(url,function (result) {
         if (!result){
@@ -43,18 +42,108 @@ function doActivityTasks(url) {
 
             $('.task_details').click(function () {
                 var task_id = $(this).attr('task_id');
-                showTaskProcessesById(task_id);
+                var started_at = $(this).find('small').text();
+                var task_name = $(this).attr('task_name');
+                showTaskProgressesById(task_id,task_name,started_at);
 
             });
         }
     });
 }
 
-function showTaskProcessesById(task_id) {
-    console.log("获取任务进度")
-    var pre_url = $('#background_process_url').val();
+//获取当前任务的所有进度，然后写进弹窗模板
+function showTaskProgressesById(task_id,task_name,started_at) {
+    var pre_url = $('#background_progress_url').val();
     var url = pre_url+"?task_id="+task_id;
-    console.log(url)
+    $.getJSON(url,function (result) {
+        if(!result){
+            return
+        }
+        //将时间转变为友好模式
+        if(result.length>0){
+            for (var i=0;i<result.length;i++){
+                var date = new Date(result[i].created_at);
+                var date_str =date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                result[i].created_at = date_str
+            }
+        }
+
+        $('#background_task_details').html('');
+        var details_templ = document.getElementById('task_details_modal').innerHTML;
+        var data = {
+            name:task_name,
+            started_at:started_at,
+            progresses:result
+        };
+        var details_html = ejs.render(details_templ,data);
+        //将模板编译后插入指定位置
+        $('#background_task_details').append(details_html);
+        //将该modal显示
+        $('#myModal4').modal('show');
+
+        //定时刷新  获取最新进度，如果没有 不做任何操作
+        var task_int = setInterval("getLastestProgresses("+task_id+")",1000,0);
+        //关闭的时候清除模板
+        $('.task_modal_close').click(function () {
+            $('#myModal4').modal('hide');
+            $('#background_task_details').html('');
+            clearInterval(task_int);
+            return false
+        });
+    });
+
+}
+
+//获取最新的数据
+function getLastestProgresses(task_id) {
+    var currentLength = $('#task_progresses_list div').length;
+    var url = "/hengwei/bgtasks/App/GetLastestProgressesWithId";
+    $.getJSON(url,{task_id:task_id,currentLength:currentLength},function (result) {
+        if(!result){
+            return
+        }
+        //将时间转变为友好模式
+        if(result.length>0){
+            //这是去除原先没有任务的时候的显示
+            var pros = $('[progress="no_results"]');
+            if(pros.length>0){
+                pros.html('');
+                $('#task_progresses_list div').removeAttr('progress');
+            }
+
+            for (var i=0;i<result.length;i++){
+                var date = new Date(result[i].created_at);
+                var date_str =date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                result[i].created_at = date_str;
+            }
+        }
+
+        if(result.length>0){
+            //在模板中循环会导致换行的问题，所以在这边进行循环
+            for (var i=0;i<result.length;i++){
+                //获取最近信息  然后插入到原来的文本中
+                var templ = document.getElementById('lastest_task_descriptions').innerHTML;
+                var data = {progresses:result[i]};
+                var html = ejs.render(templ,data);
+                $('#task_progresses_list').append(html);
+            }
+        }else{
+            return false
+        }
+    });
 }
 
 //更新当前的任务进度
+
+//测试插入数据
+function insertProgress(num) {
+    var url = "/hengwei/bgtasks/App/InsertTestProgresses"+"?num="+num;
+
+    $.getJSON(url,function (result) {
+        if (!result){
+            return
+        }else if (result=="ok"){
+            console.log("插入"+num+"条数据成功");
+        }
+    });
+}

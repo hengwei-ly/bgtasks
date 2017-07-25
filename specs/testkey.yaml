@@ -1,0 +1,22 @@
+name: TestKey
+table: tpt_test_keys
+index_label: key测试
+new_label: 新建key测试
+edit_label: 编辑key测试
+fields:
+- name: id
+  description: ID
+  label: ID
+  type: biginteger
+  required: true
+  readonly: true
+  unique: true
+- name: name
+  description: 用户名
+  label: 用户名
+  type: string
+  required: true
+  restrictions:
+    minlength: 2
+    maxlength: 250
+

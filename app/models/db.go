@@ -25,14 +25,14 @@ func (backgroundTask *BackgroundTask) TableName() string {
 	return "tpt_background_tasks"
 }
 
-type BackgroundTaskProcess struct {
+type BackgroundTaskProgress struct {
 	ID               int64     `json:"id" xorm:"id pk autoincr"`
 	BackgroundTaskId int64     `json:"background_task_id,omitempty" xorm:"background_task_id"`
 	Description      string    `json:"description,omitempty" xorm:"description"`
 	CreatedAt        time.Time `json:"created_at,omitempty" xorm:"created_at created"`
 }
 
-func (backgroundTaskProcess *BackgroundTaskProcess) TableName() string {
+func (backgroundTaskProgress *BackgroundTaskProgress) TableName() string {
 	return "tpt_background_task_progresses"
 }
 
@@ -41,16 +41,16 @@ func (db *DB) BackgroundTasks() *orm.Collection {
 		return &BackgroundTask{}
 	})(db.Engine)
 }
-func (db *DB) BackgroundTaskProcesses() *orm.Collection {
+func (db *DB) BackgroundTaskProgresses() *orm.Collection {
 	return orm.New(func() interface{} {
-		return &BackgroundTaskProcess{}
+		return &BackgroundTaskProgress{}
 	})(db.Engine)
 }
 
 func InitTables(engine *xorm.Engine) error {
 	beans := []interface{}{
 		&BackgroundTask{},
-		&BackgroundTaskProcess{},
+		&BackgroundTaskProgress{},
 	}
 
 	if err := engine.CreateTables(beans...); err != nil {
